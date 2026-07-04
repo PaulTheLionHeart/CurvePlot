@@ -88,11 +88,13 @@ CurvePlot/
 
 ## History
 
-CurvePlot began as a lightweight graphing program written by Paul the LionHeart.
+CurvePlot was originally written while Paul the LionHeart was studying an online course in multivariable calculus. When the lecturer recommended purchasing a graphing calculator, Paul decided to write one instead.
 
-The mathematical expression parser is based on the original Fractint parser written by Mark C. Peterson and incorporates later work by Chuck Ebbert, Tim Wegner, and others. The parser has been adapted and modernised for use within CurvePlot.
+Built using the mathematical expression parser originally developed for Fractint by Mark C. Peterson and later enhanced by Chuck Ebbert, Tim Wegner, and others, CurvePlot reuses many of the interactive ideas developed for ManpWIN, adapting them into a lightweight mathematical exploration tool.
 
-Originally written as a personal mathematical exploration tool, CurvePlot has been modernised for today's 64-bit Windows systems while preserving the speed and simplicity of the original application. Copy Image copies the complete rendered plot—including the graph, legend, and status bar—to the Windows clipboard.
+Originally created as a personal learning aid, CurvePlot has since been modernised for today's 64-bit Windows systems while preserving the speed, simplicity, and responsiveness of the original application.
+
+Copy Image copies the complete rendered plot—including the graph, legend, and status bar—to the Windows clipboard.
 
 ---
 
