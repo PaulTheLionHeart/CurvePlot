@@ -274,10 +274,9 @@ void	CDib::Text2Dib(HDC hDc, RECT *rect, LOGFONT *lf, TCHAR *text)
     }
 void	CDib::Text2Dib(HDC hDc, RECT *rect, COLORREF FontColour, COLORREF BkgColour, LOGFONT *lf, int TransparentText, TCHAR *text)
     {
-    HDC	hdc;
+    HDC		hdc;
     HBITMAP	hBitmap;
 
-//    HDC	hDc = GetDC(hwnd); 
     if ((hdc = CreateCompatibleDC(hDc)) == NULL)
 	return;
     SetTextColor(hdc, FontColour);
@@ -293,6 +292,36 @@ void	CDib::Text2Dib(HDC hDc, RECT *rect, COLORREF FontColour, COLORREF BkgColour
     if (GetDIBits(hDc, hBitmap, 0, DibHeight, DibPixels, (LPBITMAPINFO)pDibInf, DIB_RGB_COLORS) == 0)
 	return;
     DeleteObject(hBitmap);
-//    ReleaseDC(hwnd, hDc);
     }
 
+void	CDib::Rectangle2Dib(const RECT& rect, COLORREF colour)
+    {
+    int left = max(0, rect.left);
+    int top = max(0, rect.top);
+    int right = min((int)DibWidth, rect.right);
+    int bottom = min((int)DibHeight, rect.bottom);
+
+    if (BitsPerPixel != 24)
+	return;
+    RGBTRIPLE *Dest;
+    DWORD DestWidthBytes = WIDTHBYTES((DWORD)DibWidth * 24L);
+
+    RGBTRIPLE rgb;
+
+    rgb.rgbtBlue = GetBValue(colour);
+    rgb.rgbtGreen = GetGValue(colour);
+    rgb.rgbtRed = GetRValue(colour);
+
+    int rectHeight = bottom - top;
+
+    Dest = (RGBTRIPLE *)(DibPixels + (DibHeight - rectHeight - top) * DestWidthBytes) + left;
+    for (int y = top; y < bottom; y++)
+	{
+	RGBTRIPLE *p = Dest;
+
+	Dest = (RGBTRIPLE *)(DibPixels + (DibHeight - 1 - y) * DestWidthBytes) + left;
+	for (int x = left; x < right; x++)
+	    *p++ = rgb;
+	Dest += DestWidthBytes;
+	}
+    }

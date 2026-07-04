@@ -85,11 +85,11 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdL
 	{
 	wndclass.style	 	= CS_HREDRAW | CS_VREDRAW;
 	wndclass.lpfnWndProc	= WndProc;
-	wndclass.cbClsExtra		= 0;
-	wndclass.cbWndExtra		= 0;
-	wndclass.hInstance		= hInstance;
+	wndclass.cbClsExtra	= 0;
+	wndclass.cbWndExtra	= 0;
+	wndclass.hInstance	= hInstance;
 	wndclass.hIcon		= LoadIcon (hInstance, "CurvePlot");
-	wndclass.hCursor		= LoadCursor (NULL, IDC_ARROW);
+	wndclass.hCursor	= LoadCursor (NULL, IDC_ARROW);
 	wndclass.hbrBackground	= (HBRUSH)GetStockObject (WHITE_BRUSH);
 	wndclass.lpszMenuName	= "CurvePlot";
 	wndclass.lpszClassName	= "CurvePlot";
@@ -137,33 +137,26 @@ void	DoCaption (HWND hwnd, char *szTitleName)
 
 LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
      {
-     int            iMax;
-     int            iMin;
-     int            iPos;
-     int            dn;
-                   
      switch (message)
 	  {
 	  case WM_CREATE:
 	        hInst = ((LPCREATESTRUCT)lParam)->hInstance;
-	        //		lpfnAboutDlgProc = MakeProcInstance (AboutDlgProc, hInst);
-		ZoomEdge = TRUE;
+		ZoomEdge = FALSE;
 		vscroll_count = 0;				// no scrolling yet
 		hscroll_count = 0;
 		szFileName[0] = '\0';				// can't reopen if not there
-		SetScrollPos(hwnd, SB_VERT, 0, FALSE);
-		SetScrollPos(hwnd, SB_HORZ, 0, FALSE);
 		mainview(hwnd, FALSE);
 		Dib.ClearDib(255,255,255);
 		InitSamples();
-		if (DialogBox(hInst, "ScrnFormDlg", hwnd, ScrnFormDlg))
-		    {
-		    hCursor = LoadCursor(NULL, IDC_WAIT);
-		    SetCursor(hCursor);
-		    CurvePlot(hwnd);
-		    SetCursor(hCursor);
-		    InvalidateRect(hwnd, &r, FALSE);
-		    }
+		if (GenerateFormula(hwnd) < 0)
+		    return 0;
+		hCursor = LoadCursor(NULL, IDC_WAIT);
+		SetCursor(hCursor);
+		CurvePlot(hwnd);
+		hCursor = LoadCursor(NULL, IDC_ARROW);
+		SetCursor(hCursor);
+		InvalidateRect(hwnd, NULL, FALSE);
+		UpdateWindow(hwnd);
 		return 0;
 
 	  case WM_INITMENUPOPUP:
@@ -176,7 +169,6 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	  case WM_SIZE:
 		InvalidateRect(hwnd, &r, FALSE);
-		SetScrollRanges(hwnd);
 		GetClientRect(hwnd, &r);
 		xdots = width;
 		ydots = height;
@@ -240,97 +232,6 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		OutputStatusBar(hwnd);
 		return 0;
         
-
-          case WM_VSCROLL:
-            						// Calculate new vertical scroll position 
-            	GetScrollRange (hwnd, SB_VERT, &iMin, &iMax);
-            	iPos = GetScrollPos (hwnd, SB_VERT);
-            	GetClientRect (hwnd, &r);
-
-	        switch ((int) LOWORD(wParam))
-            	    {
-                    case SB_LINEDOWN:
-                        dn =  r.bottom / 16 + 1;
-                        break;
-
-                    case SB_LINEUP:
-                        dn = -r.bottom / 16 + 1;
-                        break;
-
-                    case SB_PAGEDOWN:
-                        dn =  r.bottom / 2  + 1;
-                        break;
-                        
-                    case SB_PAGEUP:
-                        dn = -r.bottom / 2  + 1;
-                        break;
-
-                    case SB_THUMBTRACK:
-                    case SB_THUMBPOSITION:
-#ifdef	WIN95								// 32 bit code
-                        dn = HIWORD(wParam)-iPos;
-#else									// 16 bit code
-                        dn = LOWORD(lParam)-iPos;
-#endif
-                        break;
-
-                    default:               dn = 0;
-	            }
-							// Limit scrolling to current scroll range
-                if (dn = BOUND (iPos + dn, iMin, iMax) - iPos) 
-                    {
-                    ScrollWindow (hwnd, 0, -dn, NULL, NULL);
-                    SetScrollPos (hwnd, SB_VERT, iPos + dn, TRUE);
-                    }
-		InvalidateRect(hwnd, &r, FALSE);
-                break;
-
-          case WM_HSCROLL:
-            						// Calculate new horizontal scroll position
-                GetScrollRange (hwnd, SB_HORZ, &iMin, &iMax);
-                iPos = GetScrollPos (hwnd, SB_HORZ);
-                GetClientRect (hwnd, &r);
-
-	        switch ((int) LOWORD(wParam))
-                    {
-                    case SB_LINEDOWN:
-                        dn =  r.right / 16 + 1;
-                        break;
-
-                    case SB_LINEUP:
-                        dn = -r.right / 16 + 1;
-                        break;
-
-                    case SB_PAGEDOWN:
-                        dn =  r.right / 2  + 1;
-                        break;
-
-                    case SB_PAGEUP:
-                        dn = -r.right / 2  + 1;
-                        break;
-
-                    case SB_THUMBTRACK:
-                    case SB_THUMBPOSITION:
-#ifdef	WIN95								// 32 bit code
-                        dn = HIWORD (wParam) -iPos;
-#else									// 16 bit code
-                        dn = LOWORD (lParam) - iPos;
-#endif
-                        break;
-
-                    default:
-                        dn = 0;
-	            }
-            						// Limit scrolling to current scroll range
-                if (dn = BOUND (iPos + dn, iMin, iMax) - iPos) 
-                    {
-                    ScrollWindow (hwnd, -dn, 0, NULL, NULL);
-                    SetScrollPos (hwnd, SB_HORZ, iPos + dn, TRUE);
-                    }
-		InvalidateRect(hwnd, &r, TRUE);
-//		EndPaint(hwnd, &ps);
-                break;
-
         case WM_KEYDOWN:					// Handle any keyboard messages
 	    ProcessKeys(hwnd, (UINT)wParam);
 	    break;
@@ -491,5 +392,4 @@ INT_PTR CALLBACK AboutDlgProc (HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 	  }
      return FALSE;
      }
-
 

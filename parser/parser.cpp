@@ -3376,21 +3376,6 @@ int	ProcessFormulaString(char *FormulaString)
 	parser_allocate();		// ParseStr() will test if this alloc worked 
 	if (frm_prescan (FormStr) == 0)	// prescan for errors
 	    return -1;
-/*
-	if (ParseStr(FormStr,1))
-	    return -1;			// parse failed, don't change fn pointers 
-	else
-	    {
-	    if(uses_jump == 1 && fill_jump_struct() == 1) 
-		{
-		stopmsg(0, ParseErrs(PE_ERROR_IN_PARSING_JUMP_STATEMENTS));
-		return 1;
-		}
-
-// all parses succeeded so set the pointers back to good functions
-	    return 0;
-	    }
-*/
 	return 0;
 	}
     else

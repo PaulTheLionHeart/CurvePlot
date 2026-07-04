@@ -28,6 +28,8 @@ class CDib
     void		Text2Dib(HDC, RECT *, COLORREF, COLORREF, LOGFONT *, int, TCHAR *);
     void		ClearDib(DWORD);
     void		ClearDib(int Red, int Green, int Blue);
+    void		Rectangle2Dib(const RECT& rect, COLORREF colour);
+
     DWORD		Size()		{ return DibSize; };
     WORD		Width()		{ return DibWidth; };
     WORD		Height()	{ return DibHeight; };

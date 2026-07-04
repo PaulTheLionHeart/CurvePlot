@@ -24,6 +24,7 @@ BOOL	PlotDerivative = TRUE;
 
 static	double	xscale, yscale;
 static	char	FormulaText[MAX_FORMULA_TEXT] = "z*z";
+static	char	Startup[720] = "z=c=pixel";
 static	char	szStatus[MAX_STATUS_TEXT] = "Formula f(z): Not specified yet";		// status bar text
 static	int	TransparentText = TRANSPARENT;
 static	double  magnitude = 1.0;
@@ -188,8 +189,8 @@ void	StatusBarInfo(void)
     {     
     char	PositionStr[3600];
 
-    sprintf(PositionStr, "X=%10.10f,Y=%10.10f,Width=%10.10f", ViewLeft, ViewBottom, ViewHeight);
-    sprintf(szStatus, "Formula f(z): %s, with screen dimensions: %s Magnitude = %f", FormulaText, PositionStr, magnitude*10.0);
+    sprintf(PositionStr, "X=%10.5f,Y=%10.5f,Width=%10.5f", ViewLeft, ViewBottom, ViewHeight);
+    sprintf(szStatus, "Formula f(z): %s, dimensions: %s Magnitude = %f", FormulaText, PositionStr, magnitude*10.0);
     }
 
 /**************************************************************************
@@ -198,7 +199,6 @@ void	StatusBarInfo(void)
 
 void	OutputStatusBar(HWND hwnd)
     {
-    HBRUSH  hbr;         // handle to brush
     RECT    StatusBarRect, LegendBarRect[4];
     DWORD   BackroundColour[4] = {0x00FFD0FF, 0x00FFFFD0, 0x00FFD0D0, 0x00C0FFFF};
     DWORD   TextColour[4] = {0x00C000C0, 0x00A0A000, 0x00FF0000, 0x00000000};
@@ -207,31 +207,33 @@ void	OutputStatusBar(HWND hwnd)
     HDC	    hdc = GetDC(hwnd); 
     int	    i;
 
-    GetClientRect (hwnd, &r);
-    StatusBarRect.left = r.left;
-    StatusBarRect.top = r.bottom - GetSystemMetrics(SM_CYMENU);// make status same size as menu
-    StatusBarRect.right = r.right; 
-    StatusBarRect.bottom = r.bottom;
-    hbr = CreateSolidBrush(0x00C0FFFF);
-    FillRect(ps.hdc, &StatusBarRect, hbr);
-    DeleteObject(hbr);
-    SetBkColor(ps.hdc, 0x00D0FFFF);
-    DrawText(ps.hdc, szStatus, (int)strlen(szStatus), &StatusBarRect, DT_CENTER);  
+    int MenuHeight = GetSystemMetrics(SM_CYMENU);
 
+    StatusBarRect.left = 0;
+    StatusBarRect.top = ydots - GetSystemMetrics(SM_CYMENU);
+    StatusBarRect.right = Dib.DibWidth;
+    StatusBarRect.bottom = ydots;
+
+    // Status bar
+    Dib.Rectangle2Dib(StatusBarRect, 0x00C0FFFF);
+    Dib.Text2Dib(ps.hdc, &StatusBarRect, 0x00000000, 0x00C0FFFF, NULL, TRANSPARENT, szStatus);
+
+    // Legend
     LegendBarRect[0].bottom = StatusBarRect.top;
     for (i = 0; i < 4; i++)
 	{
-	LegendBarRect[i].right = StatusBarRect.right; 
-	LegendBarRect[i].left = StatusBarRect.right - 80;
+	LegendBarRect[i].right = StatusBarRect.right - 8; 
+	LegendBarRect[i].left = StatusBarRect.right - 88;
 	if (i > 0)
 	    LegendBarRect[i].bottom = LegendBarRect[i - 1].top;
 	LegendBarRect[i].top = LegendBarRect[i].bottom - GetSystemMetrics(SM_CYMENU);
-	hbr = CreateSolidBrush(BackroundColour[i]);
-	FillRect(ps.hdc, &LegendBarRect[i], hbr);
-	DeleteObject(hbr);
+
+	Dib.Rectangle2Dib(LegendBarRect[i], BackroundColour[i]);
+
 	SetBkColor(ps.hdc, BackroundColour[i]);
 	SetTextColor(ps.hdc, TextColour[i]);
-	DrawText(ps.hdc, Legend[i], (int)strlen(Legend[i]), &LegendBarRect[i], DT_CENTER);
+
+	Dib.Text2Dib(ps.hdc, &LegendBarRect[i], (char *)Legend[i]);
 	}
     }
 
@@ -247,14 +249,40 @@ void	InitSamples(void)
     }
 
 /**************************************************************************
+    Generate formula string
+**************************************************************************/
+
+int	GenerateFormula(HWND hwnd)
+    {
+    char    s[MAX_PATH];
+    char    *p;
+
+    sprintf(FormulaString, "\n%s:z = %s,|z| <= 4.0 \n}\n", Startup, FormulaText);
+    p = FormulaString;
+    while (*p++)		    // just for those who insist on using x instead of z
+	{
+	if (*p == 'x')
+	    {
+	    if (*(p + 1) != 'p')
+		*p = 'z';
+	    }
+	}
+    if (ProcessFormulaString(FormulaString) != 0)
+	{
+	sprintf(s, "Formula %s is invalid", FormulaText);
+	MessageBox(hwnd, s, "Select From a List", MB_OK | MB_ICONEXCLAMATION);
+	return -1;
+	}
+    return 0;
+    }
+
+/**************************************************************************
 	Dialog Box for loading functions
 **************************************************************************/
 
 INT_PTR CALLBACK ScrnFormDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     {
     static	int	index = 4, i;
-    static	char	Startup[720] = "z=c=pixel";
-    char		*p;
     HWND		hCtrl; 
 
     switch (message) 
@@ -291,18 +319,8 @@ INT_PTR CALLBACK ScrnFormDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
                         MessageBox(hDlg, "No Choice selected", "Select From a List", MB_OK | MB_ICONEXCLAMATION);
                         break;
                         }
-		    GetDlgItemText(hDlg, IDC_FORMULAVALUE, FormulaText, 2400);
-		    sprintf(FormulaString, "\n%s:z = %s,|z| <= 4.0 \n}\n", Startup, FormulaText);
-		    p = FormulaString;
-		    while (*p++)		    // just for those who insist on using x instead of z
-			{
-			if (*p == 'x')
-			    {
-			    if (*(p+1) != 'p')	// exp?
-				*p = 'z';
-			    }
-			}
-		    if (ProcessFormulaString(FormulaString) == 0)
+		    GetDlgItemText(hDlg, IDC_FORMULAVALUE, FormulaText, MAX_FORMULA_TEXT);
+		    if (GenerateFormula(hDlg) == 0)
 			EndDialog(hDlg, TRUE);
 		    return (TRUE);
                   

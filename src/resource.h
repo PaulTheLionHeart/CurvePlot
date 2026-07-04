@@ -15,7 +15,7 @@
 #define IDC_WIDTH                               1048
 #define IDC_MAINTASPECT                         1189
 #define IDC_FORMULAVALUE                        40000
-#define IDM_COPY				40001
+#define IDM_COPY                                40000
 #define IDC_PLOTCURVE                           40002
 #define IDC_PLOTINTEGRAL                        40005
 #define IDC_PLOTDERIVATIVE                      40007

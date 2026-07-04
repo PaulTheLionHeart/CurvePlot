@@ -19,15 +19,16 @@
 void	putline(WORD, BYTE *);
 void	ClearScreen(void);
 void	GetRealClientRect (HWND, PRECT);
-void	SetScrollRanges(HWND);
+//void	SetScrollRanges(HWND);
 
 
 HPALETTE 	hpal = NULL;
 
 RECT 		WARect;					// this is the usable screen taking taskbar into account
 double		ScreenRatio;				// ratio of width / height for the screen
+
 int		height, xdots, ydots, width, bits_per_pixel;
-WORD		NewXdots = 800, NewYdots = 600;		// for non standard image sizes
+WORD		NewXdots = 800, NewYdots = 450;		// for non standard image sizes
 int		screenx, screeny;
 int		scroll_width;				// size of horizontal scroll bars
 RECT 		r;
@@ -38,6 +39,8 @@ int		caption;				// size of windows caption and scroll bars
 CDib		Dib;					// Device Independent Bitmap
 
 extern	POINT	ptSize;					// Stores DIB dimensions
+extern	double	ViewLeft;				// horizontal address 
+extern	double	ViewHeight;				// width of display 
 
 extern	void	SetupView(HWND);
 extern	void	ClosePtrs(void);
@@ -57,21 +60,19 @@ int	mainview(HWND hwnd, BOOL FileFlag)
     screeny = WARect.bottom - WARect.top;
     bits_per_pixel = 24;
 			// Some initial parameters
-    if (!FileFlag)					// image from PNG file, so don't splatter height and width
+    if (NonStandardImage)
 	{
-	if (NonStandardImage/* && !IsZoomed(hwnd) == FALSE*/)
-	    {
-	    height = NewYdots;                  
-	    width = NewXdots;
-	    }
-	else
-	    {
-	    height = screeny - GetSystemMetrics(SM_CYCAPTION) - GetSystemMetrics(SM_CYMENU) - GetSystemMetrics(SM_CYHSCROLL);                  
-	    width = screenx - GetSystemMetrics(SM_CXHSCROLL);
-	    }
-
-	ScreenRatio = (double) width / (double) height;
+	height = NewYdots;                  
+	width = NewXdots;
 	}
+    else
+	{
+	width = WARect.right - WARect.left;
+	height = WARect.bottom - WARect.top - GetSystemMetrics(SM_CYCAPTION) - GetSystemMetrics(SM_CYMENU);
+	}
+
+    ScreenRatio = (double) width / (double) height;
+
     // Compute the size of the window rectangle based on the given
     // client rectangle size and the window style, then size the window.
          
@@ -79,11 +80,11 @@ int	mainview(HWND hwnd, BOOL FileFlag)
     ptSize.x = width;
     ptSize.y = height - GetSystemMetrics(SM_CYMENU);				    // remember status bar
 
-    if (IsZoomed (hwnd))
-	SetScrollRanges (hwnd);
+//    if (IsZoomed (hwnd))
+//	SetScrollRanges (hwnd);
     xdots = width;
     ydots = height - GetSystemMetrics(SM_CYMENU);				    // remember status bar
-
+    ViewLeft = -(ViewHeight * ScreenRatio) / 2.0;
     SetupView(hwnd);
 
     ClosePtrs();							    // ready for next screen
@@ -172,46 +173,6 @@ void GetRealClientRect (HWND hwnd, PRECT lprc)
         lprc->right  += GetSystemMetrics (SM_CXVSCROLL);
     }
 
-/****************************************************************************
- *                                                                          *
- *  FUNCTION   : SetScrollRanges(hwnd)                                      *
- *                                                                          *
- *  PURPOSE    :                                                            *
- *                                                                          *
- ****************************************************************************/
-void SetScrollRanges(HWND hwnd)
-    {
-    RECT		rc;
-    int		iRangeH, iRangeV, i;
-    static	int	iSem = 0;
-
-    if (!iSem)
-	{
-	iSem++;
-	GetRealClientRect (hwnd, &rc);
-
-	for (i = 0; i < 2; i++)
-	    {
-	    iRangeV = ptSize.y - rc.bottom;
-	    iRangeH = ptSize.x - rc.right;
-
-	    if (iRangeH < 0) 
-		iRangeH = 0;
-	    if (iRangeV < 0) 
-		iRangeV = 0;
-
-	    if (GetScrollPos(hwnd, SB_VERT) > iRangeV || GetScrollPos(hwnd, SB_HORZ) > iRangeH)
-		InvalidateRect (hwnd, NULL, FALSE);
-
-	    SetScrollRange (hwnd, SB_VERT, 0, iRangeV, TRUE);
-	    SetScrollRange (hwnd, SB_HORZ, 0, iRangeH, TRUE);
-
-	    GetClientRect (hwnd, &rc);
-	    }
-	iSem--;
-	}
-    }
-
 /*-----------------------------------------
 	Close all pointers
   -----------------------------------------*/
@@ -252,7 +213,7 @@ INT_PTR CALLBACK ImageSizeDlg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 		    case IDC_X_SIZE:
 			tempX = GetDlgItemInt(hDlg, IDC_X_SIZE, &bTrans, TRUE);
 			if (MaintainAspect)
-			    SetDlgItemInt(hDlg, IDC_Y_SIZE, (int)(((double) tempX + 0.5) / 1.33333333333), TRUE);
+			    SetDlgItemInt(hDlg, IDC_Y_SIZE, (int)(((double) tempX + 0.5) / 1.7777777777), TRUE);
 		        return TRUE ;
 
 		    case IDC_Y_SIZE:
@@ -282,7 +243,7 @@ INT_PTR CALLBACK ImageSizeDlg (HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 			if (NewYdots > 4000)
 			    NewYdots = 4000;
 
-			ScreenRatio = 4.0 / 3.0;			// force reasonable aspect ratio
+			ScreenRatio = 16.0 / 9.0;			// force reasonable aspect ratio
 			NonStandardImage = TRUE;
 			EndDialog (hDlg, TRUE);
 			return TRUE;
