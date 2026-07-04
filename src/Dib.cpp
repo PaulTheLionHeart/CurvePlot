@@ -294,6 +294,17 @@ void	CDib::Text2Dib(HDC hDc, RECT *rect, COLORREF FontColour, COLORREF BkgColour
     DeleteObject(hBitmap);
     }
 
+// -----------------------------------------------------------------------------
+// Fill a rectangle directly in the DIB.
+//
+// Coordinates are expressed in DIB coordinates with the origin at the
+// lower-left corner, matching the rest of the CDib drawing primitives.
+//
+// This routine was added during the 2026 CurvePlot modernisation to allow
+// legends, status bars and other graphics to become part of the DIB itself,
+// ensuring clipboard copies exactly match the displayed image.
+// -----------------------------------------------------------------------------
+
 void	CDib::Rectangle2Dib(const RECT& rect, COLORREF colour)
     {
     int left = max(0, rect.left);

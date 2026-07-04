@@ -19,6 +19,7 @@ Enter almost any mathematical expression and instantly display its graph. CurveP
 - Built-in sample library
 - Copy graphs directly to the Windows clipboard
 - Native Win32 application (no MFC)
+- Copy Image support copies the complete rendered plot to the Windows clipboard, including the graph, legend, and status bar.
 
 ---
 
@@ -91,7 +92,7 @@ CurvePlot began as a lightweight graphing program written by Paul the LionHeart.
 
 The mathematical expression parser is based on the original Fractint parser written by Mark C. Peterson and incorporates later work by Chuck Ebbert, Tim Wegner, and others. The parser has been adapted and modernised for use within CurvePlot.
 
-Originally written as a personal mathematical exploration tool, CurvePlot has been modernised for today's 64-bit Windows systems while preserving the speed and simplicity of the original application.
+Originally written as a personal mathematical exploration tool, CurvePlot has been modernised for today's 64-bit Windows systems while preserving the speed and simplicity of the original application. Copy Image copies the complete rendered plot—including the graph, legend, and status bar—to the Windows clipboard.
 
 ---
 
