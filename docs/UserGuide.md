@@ -61,7 +61,7 @@ CurvePlot is designed to be explored interactively using the mouse.
 
 ## The Function Selection Dialog
 
-![Function Selection Dialog](../images/FunctionSelectionDialogAnnotated.png)
+![Function Selection Dialog](../images/FunctionSelectionDialog.png)
 
 The Function Selection dialog is divided into several areas:
 
