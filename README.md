@@ -1,6 +1,6 @@
 # CurvePlot
 
-*A lightweight Windows application for exploring mathematical functions visually.*
+*CurvePlot is a lightweight mathematical exploration tool for Microsoft Windows. It allows functions, together with their derivatives and integrals, to be plotted interactively.*
 
 Enter almost any mathematical expression and instantly display its graph. CurvePlot can also calculate and display the function's first derivative and indefinite integral, while allowing you to zoom and pan to investigate interesting features in detail.
 
@@ -17,23 +17,32 @@ Enter almost any mathematical expression and instantly display its graph. CurveP
 - Interactive zooming and panning
 - Adjustable image size
 - Built-in sample library
-- Copy graphs directly to the Windows clipboard
 - Native Win32 application (no MFC)
 - Copy Image support copies the complete rendered plot to the Windows clipboard, including the graph, legend, and status bar.
 
 ---
 
-Examples include:
+## Documentation
 
-- Polynomial functions
+For a complete guide to using CurvePlot, including examples, zooming, and mathematical exploration, see:
+
+- [User Guide](docs/UserGuide.md)
+
+---
+
+### Formula Library
+
+CurvePlot includes a growing library of sample mathematical functions covering:
+
+- Polynomials
 - Trigonometric functions
 - Hyperbolic functions
 - Exponential and logarithmic functions
-- Fourier series
-- Square waves
-- Sawtooth waves
-- Triangle waves
-- Impulse trains
+- Gaussian and sinc functions
+- Logistic and damped oscillations
+- Fourier series approximations of common waveforms
+
+Each sample includes a short description to encourage mathematical exploration.
 
 ---
 
@@ -111,10 +120,6 @@ The parser retains the original Fractint copyright notice where applicable.
 - CMake build system
 - Multiple graph support
 - Anti-aliased rendering
-- Mouse wheel zoom
-- SVG export
-- Improved documentation
-- Additional mathematical functions
 
 ---
 

@@ -321,7 +321,7 @@ int	ZoomOut(HWND hwnd, RECT *Rect)
     xleft   = Rect->left;
     xright  = Rect->right;
 						    // adjust the zoom-box for aspect ratio
-    half_win_aspect = (double)ydots/(double)xdots * 0.5;
+    half_win_aspect = (double)xdots / (double)ydots * 0.5;
     width_factor = 1.0 / (double) (abs(ybottom - ytop)) * (double) ydots;
 
     centrex = ViewLeft + (ViewHeight * half_win_aspect);		// centre 

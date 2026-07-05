@@ -1,44 +1,67 @@
-const  char	*Samples[] =
+#include "CurvePlot.h"
+
+extern const FunctionTable Samples[] =
     {
-    "x",
-    "x*x",
-    "x*x*x",
-    "x*x*x*x",
-    "x*x*x*x*x",
-    "x*x*x*x*x*x",
-    "1/x",
-    "1/(x*x)",
-    "sin(x)",
-    "sin(x*pi)",
-    "cos(x)",
-    "tan(x)",
-    "asin(x)",
-    "acos(x)",
-    "atan(x)",
-    "sinh(x)",
-    "cosh(x)",
-    "tanh(x)",
-    "asinh(x)",
-    "acosh(x)",
-    "atanh(x)",
-    "abs(x)",
-    "exp(x)",
-    "sqr(x)",
-    "sqrt(x)",
-    "log(x)",
-    "abs(sin(x))",
-    "e^x",
-    "e^(-x)",
-    "x^x",
-    "x^1.5",
-    "round(x)",
-    "sqrt(4-x*x)",
-    "sin(x)+sin(3*x)/3+sin(5*x)/5+sin(7*x)/7+sin(9*x)/9+sin(11*x)/11+sin(13*x)/13+sin(15*x)/15+sin(17*x)/17+sin(19*x)/19\
+    { "x",                      "Identity function" },
+    { "x*x",                    "Quadratic (Parabola)" },
+    { "x*x*x",                  "Cubic" },
+    { "x*x*x*x",                "Quartic" },
+    { "x*x*x*x*x",              "Quintic" },
+    { "x*x*x*x*x*x",            "Sixth-order polynomial" },
+    { "x*x*x-3*x",              "Cubic with turning points" },
+
+    { "1/x",                    "Reciprocal (Hyperbola)" },
+    { "1/(x*x)",                "Inverse square" },
+
+    { "sin(x)",                 "Sine wave" },
+    { "sin(x*pi)",              "Sine wave (p scaling)" },
+    { "cos(x)",                 "Cosine wave" },
+    { "tan(x)",                 "Tangent" },
+    { "asin(x)",                "Inverse sine" },
+    { "acos(x)",                "Inverse cosine" },
+    { "atan(x)",                "Inverse tangent" },
+
+    { "sinh(x)",                "Hyperbolic sine" },
+    { "cosh(x)",                "Hyperbolic cosine" },
+    { "tanh(x)",                "Hyperbolic tangent" },
+    { "asinh(x)",               "Inverse hyperbolic sine" },
+    { "acosh(x)",               "Inverse hyperbolic cosine" },
+    { "atanh(x)",               "Inverse hyperbolic tangent" },
+
+    { "abs(x)",                 "Absolute value" },
+    { "exp(x)",                 "Exponential" },
+    { "sqr(x)",                 "Square function" },
+    { "sqrt(x)",                "Square root" },
+    { "log(x)",                 "Natural logarithm" },
+    { "abs(sin(x))",            "Rectified sine wave" },
+
+    { "e^x",                    "Exponential (Euler's number)" },
+    { "e^(-x)",                 "Exponential decay" },
+
+    { "x^x",                    "Power tower (x raised to itself)" },
+    { "x^1.5",                  "Fractional power" },
+
+    { "round(x)",               "Round to nearest integer" },
+    { "sqrt(4-x*x)",            "Upper semicircle" },
+
+    { "exp(-x*x)",              "Gaussian bell curve" },
+    { "sin(x)/x",               "Sinc function" },
+    { "1/(1+exp(-x))",          "Logistic (Sigmoid) curve" },
+    { "sin(x)*exp(-x/5)",       "Exponentially damped sine wave" },
+    { "sin(x)*exp(-abs(x)/5)",  "Symmetrically damped sine wave" },
+    { "(1-x*x)*exp(-x*x/2)",    "Mexican Hat wavelet" },
+    { "1/(1+x*x)",              "Lorentzian curve" },
+    { "cos(5*x)/(1+x*x)",       "Damped cosine" },
+    { "exp(sin(x))",            "Exponentially modulated sine" },
+    { "x*sin(x)",               "Growing sine wave" },
+
+    { "sin(x)+sin(3*x)/3+sin(5*x)/5+sin(7*x)/7+sin(9*x)/9+sin(11*x)/11+sin(13*x)/13+sin(15*x)/15+sin(17*x)/17+sin(19*x)/19\
 +sin(21*x)/21+sin(23*x)/23+sin(25*x)/25+sin(27*x)/27+sin(29*x)/29+sin(31*x)/31+sin(33*x)/33+sin(35*x)/35+sin(37*x)/37+sin(39*x)/39\
 +sin(41*x)/41+sin(43*x)/43+sin(45*x)/45+sin(47*x)/47+sin(49*x)/49+sin(51*x)/51+sin(53*x)/53+sin(55*x)/55+sin(57*x)/57+sin(59*x)/59\
 +sin(61*x)/61+sin(63*x)/63+sin(65*x)/65+sin(67*x)/67+sin(69*x)/69+sin(71*x)/71+sin(73*x)/73+sin(75*x)/75+sin(77*x)/77+sin(79*x)/79\
-+sin(81*x)/81+sin(83*x)/83+sin(85*x)/85+sin(87*x)/87+sin(89*x)/89+sin(91*x)/91+sin(93*x)/93+sin(95*x)/95+sin(97*x)/97+sin(99*x)/99",	// square wave 1
-    "sin(x)+sin(3*x)/3+sin(5*x)/5+sin(7*x)/7+sin(9*x)/9+sin(11*x)/11+sin(13*x)/13+sin(15*x)/15+sin(17*x)/17+sin(19*x)/19\
++sin(81*x)/81+sin(83*x)/83+sin(85*x)/85+sin(87*x)/87+sin(89*x)/89+sin(91*x)/91+sin(93*x)/93+sin(95*x)/95+sin(97*x)/97+sin(99*x)/99", 
+"Fourier series approximation to a square wave" }, 
+    { "sin(x)+sin(3*x)/3+sin(5*x)/5+sin(7*x)/7+sin(9*x)/9+sin(11*x)/11+sin(13*x)/13+sin(15*x)/15+sin(17*x)/17+sin(19*x)/19\
 +sin(21*x)/21+sin(23*x)/23+sin(25*x)/25+sin(27*x)/27+sin(29*x)/29+sin(31*x)/31+sin(33*x)/33+sin(35*x)/35+sin(37*x)/37+sin(39*x)/39\
 +sin(41*x)/41+sin(43*x)/43+sin(45*x)/45+sin(47*x)/47+sin(49*x)/49+sin(51*x)/51+sin(53*x)/53+sin(55*x)/55+sin(57*x)/57+sin(59*x)/59\
 +sin(61*x)/61+sin(63*x)/63+sin(65*x)/65+sin(67*x)/67+sin(69*x)/69+sin(71*x)/71+sin(73*x)/73+sin(75*x)/75+sin(77*x)/77+sin(79*x)/79\
@@ -52,20 +75,22 @@ const  char	*Samples[] =
 +sin(221*x)/221+sin(223*x)/223+sin(225*x)/225+sin(227*x)/227+sin(229*x)/229+sin(231*x)/231+sin(233*x)/233+sin(235*x)/235+sin(237*x)/237+sin(239*x)/239\
 +sin(241*x)/241+sin(243*x)/243+sin(245*x)/245+sin(247*x)/247+sin(249*x)/249+sin(251*x)/251+sin(253*x)/253+sin(255*x)/255+sin(257*x)/257+sin(259*x)/259\
 +sin(261*x)/261+sin(263*x)/263+sin(265*x)/265+sin(267*x)/267+sin(269*x)/269+sin(271*x)/271+sin(273*x)/273+sin(275*x)/275+sin(277*x)/277+sin(279*x)/279\
-+sin(281*x)/281+sin(283*x)/283+sin(285*x)/285+sin(287*x)/287+sin(289*x)/289+sin(291*x)/291+sin(293*x)/293+sin(295*x)/295+sin(297*x)/297+sin(299*x)/299",	// square wave 2
-    "sin(x)-sin(2*x)/2+sin(3*x)/3-sin(4*x)/4+sin(5*x)/5-sin(6*x)/6+sin(7*x)/7-sin(8*x)/8+sin(9*x)/9-sin(10*x)/10\
++sin(281*x)/281+sin(283*x)/283+sin(285*x)/285+sin(287*x)/287+sin(289*x)/289+sin(291*x)/291+sin(293*x)/293+sin(295*x)/295+sin(297*x)/297+sin(299*x)/299", 
+"Higher-order Fourier square wave. This version contains 150 terms to show how waveforms can have infinite harmonics" },
+    { "sin(x)-sin(2*x)/2+sin(3*x)/3-sin(4*x)/4+sin(5*x)/5-sin(6*x)/6+sin(7*x)/7-sin(8*x)/8+sin(9*x)/9-sin(10*x)/10\
 +sin(11*x)/11-sin(12*x)/12+sin(13*x)/13-sin(14*x)/14+sin(15*x)/15-sin(16*x)/16+sin(17*x)/17-sin(18*x)/18+sin(19*x)/19-sin(20*x)/20\
 +sin(21*x)/21-sin(22*x)/22+sin(23*x)/23-sin(24*x)/24+sin(25*x)/25-sin(26*x)/26+sin(27*x)/27-sin(28*x)/28+sin(29*x)/29-sin(30*x)/30\
 +sin(31*x)/31-sin(32*x)/32+sin(33*x)/33-sin(34*x)/34+sin(35*x)/35-sin(36*x)/36+sin(37*x)/37-sin(38*x)/38+sin(39*x)/39-sin(40*x)/40\
-+sin(41*x)/41-sin(42*x)/42+sin(43*x)/43-sin(44*x)/44+sin(45*x)/45-sin(46*x)/46+sin(47*x)/47-sin(48*x)/48+sin(49*x)/49-sin(50*x)/50",	// sawtooth wave
-    "cos(x)+cos(3*x)/9+cos(5*x)/25+cos(7*x)/49+cos(9*x)/81+cos(11*x)/121+cos(13*x)/169+cos(15*x)/225+cos(17*x)/289+cos(19*x)/361\
++sin(41*x)/41-sin(42*x)/42+sin(43*x)/43-sin(44*x)/44+sin(45*x)/45-sin(46*x)/46+sin(47*x)/47-sin(48*x)/48+sin(49*x)/49-sin(50*x)/50", "Fourier sawtooth wave" },
+    { "cos(x)+cos(3*x)/9+cos(5*x)/25+cos(7*x)/49+cos(9*x)/81+cos(11*x)/121+cos(13*x)/169+cos(15*x)/225+cos(17*x)/289+cos(19*x)/361\
 +cos(21*x)/441+cos(23*x)/529+cos(25*x)/625+cos(27*x)/729+cos(29*x)/841+cos(31*x)/961+cos(33*x)/1089+cos(35*x)/1225+cos(37*x)/1369+cos(39*x)/1521\
-+cos(41*x)/1681+cos(43*x)/1849+cos(45*x)/2025+cos(47*x)/2209+cos(49*x)/2401+cos(51*x)/2601+cos(53*x)/2809+cos(55*x)/3025+cos(57*x)/3249+cos(59*x)/3481",	// triangular wave
-    "sin(x)-sin(3*x)+sin(5*x)-sin(7*x)+sin(9*x)-sin(11*x)+sin(13*x)-sin(15*x)+sin(17*x)-sin(19*x)\
++cos(41*x)/1681+cos(43*x)/1849+cos(45*x)/2025+cos(47*x)/2209+cos(49*x)/2401+cos(51*x)/2601+cos(53*x)/2809+cos(55*x)/3025+cos(57*x)/3249+cos(59*x)/3481", 
+"Fourier triangular wave" },
+    { "sin(x)-sin(3*x)+sin(5*x)-sin(7*x)+sin(9*x)-sin(11*x)+sin(13*x)-sin(15*x)+sin(17*x)-sin(19*x)\
 +sin(21*x)-sin(23*x)+sin(25*x)-sin(27*x)+sin(29*x)-sin(31*x)+sin(33*x)-sin(35*x)+sin(37*x)-sin(39*x)\
 +sin(41*x)-sin(43*x)+sin(45*x)-sin(47*x)+sin(49*x)-sin(51*x)+sin(53*x)-sin(55*x)+sin(57*x)-sin(59*x)\
 +sin(61*x)-sin(63*x)+sin(65*x)-sin(67*x)+sin(69*x)-sin(71*x)+sin(73*x)-sin(75*x)+sin(77*x)-sin(79*x)\
-+sin(81*x)-sin(83*x)+sin(85*x)-sin(87*x)+sin(89*x)-sin(91*x)+sin(93*x)-sin(95*x)+sin(97*x)-sin(99*x)",	// impulse train
-    nullptr
-    };
++sin(81*x)-sin(83*x)+sin(85*x)-sin(87*x)+sin(89*x)-sin(91*x)+sin(93*x)-sin(95*x)+sin(97*x)-sin(99*x)", "Fourier impulse train" },
 
+    { nullptr, nullptr }
+    };

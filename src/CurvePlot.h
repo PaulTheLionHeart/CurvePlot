@@ -33,4 +33,9 @@ extern	int	height, xdots, ydots, width, bits_per_pixel, planes;
 extern	void	outpoint(WORD, WORD, DWORD);		// functions
 extern	int	GenerateFormula(HWND hwnd);
 
+struct FunctionTable
+    {
+    const char *formula;
+    const char *description;
+    };
 

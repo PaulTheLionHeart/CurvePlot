@@ -23,7 +23,7 @@ BOOL	PlotIntegral = TRUE;
 BOOL	PlotDerivative = TRUE;
 
 static	double	xscale, yscale;
-static	char	FormulaText[MAX_FORMULA_TEXT] = "z*z";
+static	char	FormulaText[MAX_FORMULA_STRING] = "z*z*z";
 static	char	Startup[720] = "z=c=pixel";
 static	char	szStatus[MAX_STATUS_TEXT] = "Formula f(z): Not specified yet";		// status bar text
 static	int	TransparentText = TRANSPARENT;
@@ -49,7 +49,7 @@ extern	int	col, row;
 extern	char	ErrorMessage[];
 extern	Complex	z, q, c;
 extern	CDib	Dib;				// Device Independent Bitmap
-extern	const	char	*Samples[];
+extern	const	FunctionTable Samples[];
 
 /**************************************************************************
 	Axis Plotting Routine
@@ -103,7 +103,6 @@ void	PlotAxes(void)
 int	CurvePlot(HWND hwnd)
     {
     int	    i, iZero, u;
-//    int	    uOld, vOld, wOld;
     long    v, w, q;
     double  dx, dy, area, slope, oldFx = 0;
 
@@ -123,8 +122,6 @@ int	CurvePlot(HWND hwnd)
 	row = 0;
 	z.x = (double)i / xscale / M + ViewLeft;
 	z.y = 0.0;					// not ready for complex functions yet
-//	c.x = 0.0;
-//	c.y = 0.0;
 	if (form_per_pixel())
 	    Formula();
 	else
@@ -244,7 +241,7 @@ void	OutputStatusBar(HWND hwnd)
 void	InitSamples(void)
     {
     SampleCount = 0;
-    while (Samples[SampleCount])
+    while (Samples[SampleCount].formula)
 	SampleCount++;
     }
 
@@ -282,14 +279,14 @@ int	GenerateFormula(HWND hwnd)
 
 INT_PTR CALLBACK ScrnFormDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     {
-    static	int	index = 4, i;
+    static	int	index = 2, i;
     HWND		hCtrl; 
 
     switch (message) 
 	{
         case WM_INITDIALOG:
             for (i = 0; i < SampleCount; i++) 
-                SendDlgItemMessage(hDlg, IDC_FUNCTIONLIST, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(Samples[i]));
+                SendDlgItemMessage(hDlg, IDC_FUNCTIONLIST, LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(Samples[i].formula));
             SendDlgItemMessage(hDlg, IDC_FUNCTIONLIST, LB_SETCURSEL, (WPARAM)index, 0L);
 	    hCtrl = GetDlgItem (hDlg, IDC_PLOTCURVE);
 	    SendMessage(hCtrl, BM_SETCHECK, PlotCurve, 0L);
@@ -298,9 +295,10 @@ INT_PTR CALLBACK ScrnFormDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 	    hCtrl = GetDlgItem (hDlg, IDC_PLOTDERIVATIVE);
 	    SendMessage(hCtrl, BM_SETCHECK, PlotDerivative, 0L);
 	    SetDlgItemText(hDlg, IDC_FORMULAVALUE, FormulaText);
-	    ViewLeft = -3.0;		// horizontal address
-	    ViewBottom = -2.5;		// vertical address
-	    ViewHeight = 5.0;		// width of display
+	    ViewBottom = -2.0;		// vertical address
+	    ViewHeight = 4.0;		// width of display
+	    ViewLeft = -(ViewHeight * ScreenRatio) / 2.0;
+	    SetDlgItemText(hDlg, IDC_DESCRIPTION, Samples[index].description);
             return (TRUE);
 
         case WM_COMMAND:
@@ -319,7 +317,7 @@ INT_PTR CALLBACK ScrnFormDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
                         MessageBox(hDlg, "No Choice selected", "Select From a List", MB_OK | MB_ICONEXCLAMATION);
                         break;
                         }
-		    GetDlgItemText(hDlg, IDC_FORMULAVALUE, FormulaText, MAX_FORMULA_TEXT);
+		    GetDlgItemText(hDlg, IDC_FORMULAVALUE, FormulaText, MAX_FORMULA_STRING);
 		    if (GenerateFormula(hDlg) == 0)
 			EndDialog(hDlg, TRUE);
 		    return (TRUE);
@@ -345,7 +343,8 @@ INT_PTR CALLBACK ScrnFormDlg(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
 				break;
 				}
 			    }
-		    SetDlgItemText(hDlg, IDC_FORMULAVALUE, Samples[index]);
+		    SetDlgItemText(hDlg, IDC_FORMULAVALUE, Samples[index].formula);
+		    SetDlgItemText(hDlg, IDC_DESCRIPTION, Samples[index].description);
 		    break;
 
 	    return (TRUE);

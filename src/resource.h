@@ -8,6 +8,7 @@
 #define IDI_ICON1                               109
 #define IDC_FULLSCREEN                          1000
 #define IDC_ERROR                               1001
+#define IDC_DESCRIPTION                         1002
 #define IDM_ABOUT                               1002
 #define IDC_X_SIZE                              1036
 #define IDC_Y_SIZE                              1037
